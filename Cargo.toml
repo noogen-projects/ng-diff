@@ -1,0 +1,13 @@
+[package]
+name = "ng-diff"
+version = "0.1.0"
+authors = ["Noogen Team <info.noogen@gmail.com>"]
+edition = "2018"
+license = "CC0-1.0"
+readme = "README.md"
+repository = "https://github.com/noogen-projects/ng-diff"
+description = "A Rust library that implements a Hirschberg's LCS based linear space diffing"
+keywords = ["noogen", "lcs", "diff", "difference", "hirschberg", "compare"]
+categories = ["algorithms", "text processing"]
+
+[dependencies]
