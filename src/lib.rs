@@ -11,11 +11,11 @@ mod chars;
 
 /// The interface of the Needleman-Wunsch score matrix line
 pub trait NwScoreLine: IndexMut<usize, Output = usize> {
-    fn new(len: usize) -> Self;
+    fn zeroed(len: usize) -> Self;
 }
 
 impl NwScoreLine for Vec<usize> {
-    fn new(len: usize) -> Self {
+    fn zeroed(len: usize) -> Self {
         vec![0; len]
     }
 }
@@ -31,26 +31,23 @@ where
     Line: NwScoreLine,
 {
     let (a, b) = (a.into_iter(), b.into_iter());
-    let mut penult = Line::new(b.len());
-    let mut last = Line::new(b.len());
+    let mut penult = Line::zeroed(b.len());
 
     for a in a {
-        let tmp = penult;
-        penult = last;
-        last = tmp;
         let mut prev_penult = 0;
         let mut prev_last = 0;
         for (j, b) in b.clone().enumerate() {
-            if a == b {
-                last[j] = prev_penult + 1;
+            let last = if a == b {
+                prev_penult + 1
             } else {
-                last[j] = prev_last.max(penult[j]);
-            }
+                prev_last.max(penult[j])
+            };
             prev_penult = penult[j];
-            prev_last = last[j];
+            prev_last = last;
+            penult[j] = last;
         }
     }
-    last
+    penult
 }
 
 #[cfg(test)]
