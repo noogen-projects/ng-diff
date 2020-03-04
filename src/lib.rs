@@ -5,6 +5,10 @@
 
 use std::ops::IndexMut;
 
+pub use chars::Chars;
+
+mod chars;
+
 /// The interface of the Needleman-Wunsch score matrix line
 pub trait NwScoreLine: IndexMut<usize, Output = usize> {
     fn new(len: usize) -> Self;
@@ -74,6 +78,9 @@ mod tests {
         assert_eq!(last, vec![1, 2, 2, 3, 3, 4, 4]);
 
         let last: Vec<_> = score_last_line(&Vec::from("BDCABA"), &b"ABCBDAB"[..]);
+        assert_eq!(last, vec![1, 2, 2, 3, 3, 4, 4]);
+
+        let last: Vec<_> = score_last_line(vec!['B', 'D', 'C', 'A', 'B', 'A'], Chars::new("ABCBDAB"));
         assert_eq!(last, vec![1, 2, 2, 3, 3, 4, 4]);
     }
 }
