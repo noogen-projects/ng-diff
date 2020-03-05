@@ -1,23 +1,43 @@
 use std::iter::FusedIterator;
 
+pub trait AsCharsIter {
+    fn chars_iter(&self) -> CharsIter;
+}
+
+impl AsCharsIter for str {
+    fn chars_iter(&self) -> CharsIter {
+        self.into()
+    }
+}
+
+impl AsCharsIter for String {
+    fn chars_iter(&self) -> CharsIter {
+        self.into()
+    }
+}
+
 /// An `ExactSizeIterator` implementation over the `char`s of
 /// a string slice.
 #[derive(Debug, Clone)]
-pub struct Chars<'a> {
+pub struct CharsIter<'a> {
     chars: std::str::Chars<'a>,
+    len: usize,
 }
 
-impl Iterator for Chars<'_> {
+impl Iterator for CharsIter<'_> {
     type Item = char;
 
     #[inline]
     fn next(&mut self) -> Option<char> {
+        if self.len > 0 {
+            self.len -= 1;
+        }
         self.chars.next()
     }
 
     #[inline]
     fn size_hint(&self) -> (usize, Option<usize>) {
-        self.chars.size_hint()
+        (self.len, Some(self.len))
     }
 
     #[inline]
@@ -31,37 +51,28 @@ impl Iterator for Chars<'_> {
     }
 }
 
-impl DoubleEndedIterator for Chars<'_> {
+impl DoubleEndedIterator for CharsIter<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<char> {
+        if self.len > 0 {
+            self.len -= 1;
+        }
         self.chars.next_back()
     }
 }
 
-impl FusedIterator for Chars<'_> {}
+impl FusedIterator for CharsIter<'_> {}
 
-impl ExactSizeIterator for Chars<'_> {
-    #[inline]
-    fn len(&self) -> usize {
-        self.chars.clone().count()
-    }
+impl ExactSizeIterator for CharsIter<'_> {}
 
-    // Use this impl when `is_empty` will be stabilized:
-    // https://github.com/rust-lang/rust/issues/35428
-    //
-    // #[inline]
-    // fn is_empty(&self) -> bool {
-    //     self.chars.size_hint().1
-    //         .map(|len| len == 0)
-    //         .unwrap_or_default()
-    // }
-}
-
-impl<'a> Chars<'a> {
+impl<'a> CharsIter<'a> {
     #[inline]
     pub fn new(source: &'a str) -> Self {
+        let chars = source.chars();
+        let len = chars.clone().count();
         Self {
-            chars: source.chars()
+            chars,
+            len,
         }
     }
 
@@ -71,25 +82,25 @@ impl<'a> Chars<'a> {
     }
 }
 
-impl<'a> From<&'a str> for Chars<'a> {
+impl<'a> From<&'a str> for CharsIter<'a> {
     fn from(source: &'a str) -> Self {
         Self::new(source)
     }
 }
 
-impl<'a> From<&'a mut str> for Chars<'a> {
+impl<'a> From<&'a mut str> for CharsIter<'a> {
     fn from(source: &'a mut str) -> Self {
         Self::new(source)
     }
 }
 
-impl<'a> From<&'a String> for Chars<'a> {
+impl<'a> From<&'a String> for CharsIter<'a> {
     fn from(source: &'a String) -> Self {
         Self::new(source.as_str())
     }
 }
 
-impl<'a> From<&'a mut String> for Chars<'a> {
+impl<'a> From<&'a mut String> for CharsIter<'a> {
     fn from(source: &'a mut String) -> Self {
         Self::new(source.as_str())
     }
