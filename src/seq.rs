@@ -16,18 +16,80 @@ impl NwScoreLine for Vec<usize> {
     }
 }
 
-pub trait Subsequence<T> {
+pub trait Insert<T> {
     fn empty() -> Self;
-    fn push(&mut self, item: T);
+    fn insert(&mut self, item: T);
 }
 
-impl<T> Subsequence<T> for Vec<T> {
+impl<T> Insert<T> for Vec<T> {
     fn empty() -> Self {
         Self::new()
     }
 
-    fn push(&mut self, item: T) {
+    fn insert(&mut self, item: T) {
         self.push(item)
+    }
+}
+
+pub trait Difference<T> {
+    fn empty() -> Self;
+    fn push_first(&mut self, item: T);
+    fn push_both(&mut self, item: T);
+    fn push_second(&mut self, item: T);
+}
+
+#[derive(Clone, Debug)]
+pub struct Lcs<T>(pub T);
+
+#[derive(Clone, Debug)]
+pub struct Diff<T>(pub T);
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum DiffItem<T> {
+    First(T),
+    Both(T),
+    Second(T),
+}
+
+impl<T> DiffItem<T> {
+    pub fn into_inner(self) -> T {
+        match self {
+            DiffItem::First(x)
+            | DiffItem::Both(x)
+            | DiffItem::Second(x) => x,
+        }
+    }
+}
+
+impl<T, I: Insert<T>> Difference<T> for Lcs<I> {
+    fn empty() -> Self {
+        Self(I::empty())
+    }
+
+    fn push_first(&mut self, _item: T) {}
+
+    fn push_both(&mut self, item: T) {
+        self.0.insert(item);
+    }
+
+    fn push_second(&mut self, _item: T) {}
+}
+
+impl<T, I: Insert<DiffItem<T>>> Difference<T> for Diff<I> {
+    fn empty() -> Self {
+        Self(I::empty())
+    }
+
+    fn push_first(&mut self, item: T) {
+        self.0.insert(DiffItem::First(item))
+    }
+
+    fn push_both(&mut self, item: T) {
+        self.0.insert(DiffItem::Both(item))
+    }
+
+    fn push_second(&mut self, item: T) {
+        self.0.insert(DiffItem::Second(item))
     }
 }
 
