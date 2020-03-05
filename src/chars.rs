@@ -70,10 +70,7 @@ impl<'a> CharsIter<'a> {
     pub fn new(source: &'a str) -> Self {
         let chars = source.chars();
         let len = chars.clone().count();
-        Self {
-            chars,
-            len,
-        }
+        Self { chars, len }
     }
 
     #[inline]

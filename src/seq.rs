@@ -1,9 +1,14 @@
-use std::{cmp, ops::IndexMut, iter::FusedIterator};
+use std::{cmp, iter::FusedIterator, ops::IndexMut};
 
 /// The interface of the Needleman-Wunsch score matrix line
 pub trait NwScoreLine: IndexMut<usize, Output = usize> {
     fn zeroed(len: usize) -> Self;
+
     fn len(&self) -> usize;
+
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 impl NwScoreLine for Vec<usize> {
@@ -54,9 +59,7 @@ pub enum DiffItem<T> {
 impl<T> DiffItem<T> {
     pub fn into_inner(self) -> T {
         match self {
-            DiffItem::First(x)
-            | DiffItem::Both(x)
-            | DiffItem::Second(x) => x,
+            DiffItem::First(x) | DiffItem::Both(x) | DiffItem::Second(x) => x,
         }
     }
 }
@@ -198,7 +201,7 @@ impl<I: DoubleEndedIterator + ExactSizeIterator> SeqIter<I> {
 
 impl<I> Iterator for SeqIter<I>
 where
-    I: DoubleEndedIterator + ExactSizeIterator
+    I: DoubleEndedIterator + ExactSizeIterator,
 {
     type Item = I::Item;
 
@@ -221,7 +224,7 @@ where
         let lower = cmp::min(lower, self.rest);
         let upper = match upper {
             Some(x) if x < self.rest => Some(x),
-            _ => Some(self.rest)
+            _ => Some(self.rest),
         };
 
         (lower, upper)
@@ -250,7 +253,7 @@ where
     #[inline]
     fn find<P>(&mut self, predicate: P) -> Option<I::Item>
     where
-        P: FnMut(&I::Item) -> bool
+        P: FnMut(&I::Item) -> bool,
     {
         if self.reverse {
             self.iter.rfind(predicate)
@@ -262,7 +265,7 @@ where
 
 impl<I> DoubleEndedIterator for SeqIter<I>
 where
-    I: DoubleEndedIterator + ExactSizeIterator
+    I: DoubleEndedIterator + ExactSizeIterator,
 {
     #[inline]
     fn next_back(&mut self) -> Option<I::Item> {
@@ -295,7 +298,7 @@ where
 
     fn rfind<P>(&mut self, predicate: P) -> Option<I::Item>
     where
-        P: FnMut(&I::Item) -> bool
+        P: FnMut(&I::Item) -> bool,
     {
         if self.reverse {
             self.iter.find(predicate)
@@ -333,7 +336,6 @@ mod tests {
         assert_eq!(None, iter.next_back());
         assert_eq!(0, iter.len());
 
-
         let mut iter = SeqIter::new(a.iter(), a.len()).take(0);
         assert_eq!(0, iter.len());
         assert_eq!(None, iter.next());
@@ -368,7 +370,6 @@ mod tests {
         assert_eq!(None, iter.next());
         assert_eq!(0, iter.len());
 
-
         let mut iter = SeqIter::new(a.iter(), a.len()).skip(0);
         assert_eq!(3, iter.len());
         assert_eq!(Some(&1), iter.next());
@@ -400,7 +401,6 @@ mod tests {
         assert_eq!(None, iter.next());
         assert_eq!(0, iter.len());
 
-
         let mut iter = SeqIter::new(a.iter(), a.len()).rev();
         assert_eq!(3, iter.len());
         assert_eq!(Some(&3), iter.next());
@@ -408,7 +408,6 @@ mod tests {
         assert_eq!(Some(&1), iter.next());
         assert_eq!(None, iter.next());
         assert_eq!(0, iter.len());
-
 
         let mut iter = SeqIter::new(a.iter(), a.len()).skip(1).rev();
         assert_eq!(2, iter.len());

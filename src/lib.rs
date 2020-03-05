@@ -43,7 +43,7 @@ where
 pub fn hirschberg_diff<Line, SeqA, SeqB, SeqC>(a: SeqA, b: SeqB) -> SeqC
 where
     SeqA: IntoIterator,
-    SeqA::Item: PartialEq + std::fmt::Debug,
+    SeqA::Item: PartialEq,
     SeqB: IntoIterator<Item = SeqA::Item>,
     SeqA::IntoIter: SequenceIterator,
     SeqB::IntoIter: SequenceIterator,
@@ -53,7 +53,7 @@ where
     fn hirschberg_diff_inner<Line, IterA, IterB, SeqC>(mut a: SeqIter<IterA>, b: SeqIter<IterB>, diff: &mut SeqC)
     where
         IterA: SequenceIterator,
-        IterA::Item: PartialEq + std::fmt::Debug,
+        IterA::Item: PartialEq,
         IterB: SequenceIterator + Iterator<Item = IterA::Item>,
         SeqC: Difference<IterA::Item>,
         Line: NwScoreLine,
@@ -118,7 +118,7 @@ pub trait HirschbergAlg {
     fn lcs<SeqA, SeqB, SeqC>(a: SeqA, b: SeqB) -> SeqC
     where
         SeqA: IntoIterator,
-        SeqA::Item: PartialEq + std::fmt::Debug,
+        SeqA::Item: PartialEq,
         SeqB: IntoIterator<Item = SeqA::Item>,
         SeqA::IntoIter: SequenceIterator,
         SeqB::IntoIter: SequenceIterator,
@@ -129,13 +129,13 @@ pub trait HirschbergAlg {
 
     #[inline]
     fn diff<SeqA, SeqB, SeqC>(a: SeqA, b: SeqB) -> SeqC
-        where
-            SeqA: IntoIterator,
-            SeqA::Item: PartialEq + std::fmt::Debug,
-            SeqB: IntoIterator<Item = SeqA::Item>,
-            SeqA::IntoIter: SequenceIterator,
-            SeqB::IntoIter: SequenceIterator,
-            SeqC: Insert<DiffItem<SeqA::Item>>,
+    where
+        SeqA: IntoIterator,
+        SeqA::Item: PartialEq,
+        SeqB: IntoIterator<Item = SeqA::Item>,
+        SeqA::IntoIter: SequenceIterator,
+        SeqB::IntoIter: SequenceIterator,
+        SeqC: Insert<DiffItem<SeqA::Item>>,
     {
         hirschberg_diff::<Self::Line, _, _, Diff<SeqC>>(a, b).0
     }
@@ -149,6 +149,8 @@ impl HirschbergAlg for Hirschberg {
 
 #[cfg(test)]
 mod tests {
+    use std::fmt::Display;
+
     use super::*;
 
     #[test]
@@ -229,7 +231,7 @@ mod tests {
         assert_eq!(format_diff(diff), "abcd+efg-h+ij-q-v+k+r+x+yz".to_string());
     }
 
-    fn format_diff(diff: Vec<DiffItem<impl std::fmt::Display>>) -> String {
+    fn format_diff(diff: Vec<DiffItem<impl Display>>) -> String {
         let mut line = String::new();
         for item in diff {
             match &item {
