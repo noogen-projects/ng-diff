@@ -1,6 +1,10 @@
 //! This implementation based on the Hirschberg's algorithm of computing longest
 //! common subsequence by linear space, thus algorithm requires O(mn) time and
 //! O(m + n) space.
+//!
+//! Hirschberg, D. S. (1975). "A linear space algorithm for computing maximal
+//! common subsequences". Communications of the ACM. 18 (6): 341–343.
+//! CiteSeerX 10.1.1.348.4774. doi:10.1145/360825.360861. MR 0375829.
 //! http://www.mathcs.emory.edu/~cheung/Courses/323/Syllabus/DynProg/Docs/Hirschberg=Linear-space-LCS.pdf
 
 pub use self::{chars::*, seq::*};

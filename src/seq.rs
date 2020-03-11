@@ -1,4 +1,4 @@
-use std::{cmp, iter::FusedIterator, ops::IndexMut};
+use std::{cmp, fmt, iter::FusedIterator, ops::IndexMut};
 
 /// The interface of the Needleman-Wunsch score matrix line
 pub trait NwScoreLine: IndexMut<usize, Output = usize> {
@@ -36,6 +36,46 @@ impl<T> Insert<T> for Vec<T> {
     }
 }
 
+impl Insert<char> for String {
+    fn empty() -> Self {
+        Self::new()
+    }
+
+    fn insert(&mut self, item: char) {
+        self.push(item)
+    }
+}
+
+impl Insert<&str> for String {
+    fn empty() -> Self {
+        Self::new()
+    }
+
+    fn insert(&mut self, item: &str) {
+        self.push_str(item)
+    }
+}
+
+impl Insert<&String> for String {
+    fn empty() -> Self {
+        Self::new()
+    }
+
+    fn insert(&mut self, item: &String) {
+        self.push_str(item)
+    }
+}
+
+impl Insert<String> for String {
+    fn empty() -> Self {
+        Self::new()
+    }
+
+    fn insert(&mut self, item: String) {
+        self.push_str(&item)
+    }
+}
+
 pub trait Difference<T> {
     fn empty() -> Self;
     fn push_first(&mut self, item: T);
@@ -60,6 +100,16 @@ impl<T> DiffItem<T> {
     pub fn into_inner(self) -> T {
         match self {
             DiffItem::First(x) | DiffItem::Both(x) | DiffItem::Second(x) => x,
+        }
+    }
+}
+
+impl<T: fmt::Display> fmt::Display for DiffItem<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            DiffItem::First(x) => write!(f, "- {}", x),
+            DiffItem::Both(x) => write!(f, "{}", x),
+            DiffItem::Second(x) => write!(f, "+ {}", x),
         }
     }
 }
