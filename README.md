@@ -16,8 +16,10 @@ fn main() {
 }
 ```
 
-prints the
+will print:
 
 ```
 a b c d + e f g - h + i j - q - v + k + r + x + y z 
 ```
+
+Other examples are in the [examples](examples) directory.
